@@ -175,7 +175,6 @@ export default function DoctorPortal({ initialView = 'dashboard' }: { initialVie
   const waitingEntries = queue.filter((item) => item.status === 'Waiting')
   const todayRegistrations = registrations.filter((item) => item.registrationDate === today)
   const todayCompleted = queue.filter((item) => item.status === 'Done').length
-  const openVisits = visits.filter((item) => item.status === 'Open').length
   const registrationRows = useMemo<RegistrationListRow[]>(
     () =>
       registrations.map((registration) => ({
@@ -643,9 +642,8 @@ export default function DoctorPortal({ initialView = 'dashboard' }: { initialVie
               </SectionCard>
 
               <SectionCard id="doctor-summary" title="Today OP Summary" subtitle="Quick numbers for current consultation and day OP load.">
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                <div className="grid gap-4">
                   <MiniCountCard label="Active Consultation" value={withDoctorEntry?.token ?? '--'} helper={withDoctorEntry?.patientName ?? 'No active token'} />
-                  <MiniCountCard label="Open Visits" value={openVisits} helper="Saved visit notes still open" />
                 </div>
               </SectionCard>
             </div>
@@ -1017,12 +1015,19 @@ function SearchField({
   icon: React.ReactNode
   type?: 'text' | 'date'
 }) {
+  const isDateField = type === 'date'
+
   return (
     <label className="block">
       <div className="mb-2 text-sm font-semibold text-[#4f6277]">{label}</div>
-      <div className="flex min-h-[56px] items-center gap-3 rounded-[22px] border border-[#dce6ef] bg-[#f9fbfd] px-4">
-        <span className="text-[#5f7287]">{icon}</span>
-        <input type={type} value={value} onChange={(event) => onChange(event.target.value)} className="w-full bg-transparent text-base outline-none" />
+      <div className={`flex min-h-[56px] items-center rounded-[22px] border border-[#dce6ef] bg-[#f9fbfd] ${isDateField ? 'px-4' : 'gap-3 px-4'}`}>
+        {!isDateField ? <span className="text-[#5f7287]">{icon}</span> : null}
+        <input
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className={`w-full bg-transparent text-base outline-none ${isDateField ? 'pr-2 text-[#102132] [color-scheme:light]' : ''}`}
+        />
       </div>
     </label>
   )
