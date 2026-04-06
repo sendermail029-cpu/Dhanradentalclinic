@@ -4,24 +4,51 @@ import PageTransitionShell from '@/components/PageTransitionShell'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Dhanra Dental Aesthetic & Implant Care',
+    default: 'Dhanra Dental Aesthetic & Implant Care | Vijayawada Dental Hospital',
     template: '%s | Dhanra Dental',
   },
   description:
-    'Premium dental clinic in Hyderabad offering implants, smile design, clear aligners, and doorstep dental visits (D-D-D). Book your appointment today.',
+    'Dhanra Dental Aesthetic & Implant Care is a leading dental hospital in Vijayawada offering dental implants, smile design, braces, aligners, cosmetic dentistry, root canal treatment, and advanced family dental care.',
   keywords: [
-    'dental clinic hyderabad',
+    'vijayawada dental hospital',
+    'vijayawada dental hospitals',
+    'best dental clinic in vijayawada',
+    'best dentist in vijayawada',
+    'dental clinic vijayawada',
+    'dentist near me vijayawada',
     'dental implants',
+    'dental implants vijayawada',
     'smile design',
+    'cosmetic dentistry vijayawada',
     'teeth whitening',
     'clear aligners',
-    'doorstep dentistry',
-    'home dental visit',
+    'braces treatment vijayawada',
+    'root canal treatment vijayawada',
+    'kids dentistry vijayawada',
+    'family dental care vijayawada',
+    'doorstep dentistry vijayawada',
+    'home dental visit vijayawada',
+    'ramavarapadu dental clinic',
+    'dhanra dental',
   ],
+  applicationName: 'Dhanra Dental',
+  icons: {
+    icon: '/logs.svg',
+    shortcut: '/logs.svg',
+    apple: '/logo.png',
+  },
   openGraph: {
-    title: 'Dhanra Dental Aesthetic & Implant Care',
-    description: 'Premium dental care in Hyderabad — at the clinic or your doorstep.',
+    title: 'Dhanra Dental Aesthetic & Implant Care | Vijayawada Dental Hospital',
+    description: 'Advanced dental hospital in Vijayawada for implants, braces, aligners, smile design, and complete dental care.',
     type: 'website',
+    siteName: 'Dhanra Dental',
+    images: ['/logo.png'],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Dhanra Dental Aesthetic & Implant Care | Vijayawada Dental Hospital',
+    description: 'Advanced dental care in Vijayawada for implants, braces, aligners, cosmetic dentistry, and family dental treatments.',
+    images: ['/logo.png'],
   },
 }
 
