@@ -1,0 +1,13 @@
+
+> dhanra-dental@1.0.0 dev
+> next dev
+
+  ▲ Next.js 14.2.0
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.2s
+ ○ Compiling / ...
+ ✓ Compiled / in 9.2s (1289 modules)
+ GET / 200 in 9709ms
+ ✓ Compiled in 661ms (643 modules)
