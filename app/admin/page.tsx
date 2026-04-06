@@ -88,6 +88,11 @@ export default function AdminPage() {
   const [doctorAccessForm, setDoctorAccessForm] = useState({ email: '', mobile: '', password: '' })
   const [receptionAccessForm, setReceptionAccessForm] = useState({ email: '', mobile: '', password: '' })
   const [adminAccessForm, setAdminAccessForm] = useState({ email: '', mobile: '' })
+  const [portalStatusMessage, setPortalStatusMessage] = useState({
+    admin: '',
+    doctor: '',
+    receptionist: '',
+  })
   const [successPopup, setSuccessPopup] = useState<{ open: boolean; message: string }>({
     open: false,
     message: '',
@@ -427,6 +432,10 @@ export default function AdminPage() {
         })
       }
 
+      setPortalStatusMessage((current) => ({
+        ...current,
+        [role]: `${role === 'doctor' ? 'Doctor' : 'Reception'} login submitted and saved successfully.`,
+      }))
       setFeedback(`${role === 'doctor' ? 'Doctor' : 'Receptionist'} login saved successfully.`)
       setSuccessPopup({
         open: true,
@@ -444,6 +453,10 @@ export default function AdminPage() {
         email: updated.email,
         mobile: updated.mobile,
       })
+      setPortalStatusMessage((current) => ({
+        ...current,
+        admin: 'Admin mobile number submitted and saved successfully.',
+      }))
       setFeedback('Admin mobile login saved successfully.')
       setSuccessPopup({
         open: true,
@@ -724,6 +737,7 @@ export default function AdminPage() {
               onMobileChange={(value) => setAdminAccessForm((current) => ({ ...current, mobile: value }))}
               onSave={() => void saveAdminMobileAccess()}
               onResetPassword={() => void handlePasswordReset('admin')}
+              statusMessage={portalStatusMessage.admin}
             />
             <PortalAccessSetupCard
               title="Doctor Panel Login"
@@ -736,6 +750,7 @@ export default function AdminPage() {
               onPasswordChange={(value) => setDoctorAccessForm((current) => ({ ...current, password: value }))}
               onSave={() => savePortalAccess('doctor')}
               onResetPassword={() => void handlePasswordReset('doctor')}
+              statusMessage={portalStatusMessage.doctor}
             />
             <PortalAccessSetupCard
               title="Reception Panel Login"
@@ -748,6 +763,7 @@ export default function AdminPage() {
               onPasswordChange={(value) => setReceptionAccessForm((current) => ({ ...current, password: value }))}
               onSave={() => savePortalAccess('receptionist')}
               onResetPassword={() => void handlePasswordReset('receptionist')}
+              statusMessage={portalStatusMessage.receptionist}
             />
           </div>
           <div className="mt-4 rounded-[22px] bg-[#f7fafc] p-4 text-sm leading-6 text-[#5f7287]">
@@ -889,6 +905,7 @@ function PortalAccessSetupCard({
   onPasswordChange,
   onSave,
   onResetPassword,
+  statusMessage,
 }: {
   title: string
   subtitle: string
@@ -900,6 +917,7 @@ function PortalAccessSetupCard({
   onPasswordChange: (value: string) => void
   onSave: () => void
   onResetPassword: () => void
+  statusMessage?: string
 }) {
   return (
     <div className="rounded-[28px] border border-[#dce6ef] bg-white p-6">
@@ -920,6 +938,11 @@ function PortalAccessSetupCard({
           <ActionButton className="w-full sm:w-auto" onClick={onSave}>Save Login</ActionButton>
           <ActionButton variant="secondary" className="w-full sm:w-auto" onClick={onResetPassword}>Send Reset Link</ActionButton>
         </div>
+        {statusMessage ? (
+          <div className="rounded-[18px] border border-[#cfe4d4] bg-[#f3fff5] px-4 py-3 text-sm font-medium text-[#25643b]">
+            {statusMessage}
+          </div>
+        ) : null}
       </div>
     </div>
   )
@@ -933,6 +956,7 @@ function PortalAccessReadonlyCard({
   onMobileChange,
   onSave,
   onResetPassword,
+  statusMessage,
 }: {
   title: string
   subtitle: string
@@ -941,6 +965,7 @@ function PortalAccessReadonlyCard({
   onMobileChange: (value: string) => void
   onSave: () => void
   onResetPassword: () => void
+  statusMessage?: string
 }) {
   return (
     <div className="rounded-[28px] border border-[#dce6ef] bg-white p-6">
@@ -958,6 +983,11 @@ function PortalAccessReadonlyCard({
           <ActionButton className="w-full sm:w-auto" onClick={onSave}>Save Admin Mobile</ActionButton>
           <ActionButton variant="secondary" className="w-full sm:w-auto" onClick={onResetPassword}>Send Reset Link</ActionButton>
         </div>
+        {statusMessage ? (
+          <div className="rounded-[18px] border border-[#cfe4d4] bg-[#f3fff5] px-4 py-3 text-sm font-medium text-[#25643b]">
+            {statusMessage}
+          </div>
+        ) : null}
       </div>
     </div>
   )
