@@ -30,6 +30,7 @@ const heroSlides: ReadonlyArray<{
   image: string
   imageClassName: string
   mobileImageClassName?: string
+  imageQuality?: number
   secondaryImage?: string
   secondaryImageClassName?: string
   eyebrow: string
@@ -43,11 +44,14 @@ const heroSlides: ReadonlyArray<{
   theme: 'hospital' | 'doorstep' | 'doctor' | 'treatment' | 'kids'
   metaTitle?: string
   metaBody?: string
+  desktopOverlayClassName?: string
+  mobileOverlayClassName?: string
 }> = [
   {
     image: '/about1.webp',
-    imageClassName: 'object-[52%_40%]',
-    mobileImageClassName: 'object-[52%_34%]',
+    imageClassName: 'object-[68%_38%] scale-[1.02]',
+    mobileImageClassName: 'object-[66%_34%]',
+    imageQuality: 90,
     eyebrow: 'Welcome To Dhanra Dental Hospital',
     title: 'Trusted dental care in Vijayawada.',
     description:
@@ -58,6 +62,10 @@ const heroSlides: ReadonlyArray<{
     ctaHref: '/about',
     layout: 'immersive',
     theme: 'hospital',
+    desktopOverlayClassName:
+      'bg-[linear-gradient(90deg,rgba(8,19,29,0.58)_0%,rgba(8,19,29,0.34)_34%,rgba(8,19,29,0.12)_68%,rgba(8,19,29,0.06)_100%)]',
+    mobileOverlayClassName:
+      'bg-[linear-gradient(180deg,rgba(8,19,29,0.12)_0%,rgba(8,19,29,0.24)_28%,rgba(8,19,29,0.72)_100%)]',
   },
   {
     image: '/door.webp',
@@ -405,6 +413,7 @@ function HeroCarousel() {
     activeSlide.theme === 'doorstep' || activeSlide.theme === 'doctor' || activeSlide.theme === 'treatment'
   const whiteDesktopSplitSlide = activeSlide.theme === 'doorstep'
   const blackBackgroundSplitSlide = activeSlide.title === 'Implants dentistry'
+  const activeImageQuality = activeSlide.imageQuality ?? 74
 
   return (
     <section className="relative overflow-hidden bg-[#f6f8fb] text-[#102230]">
@@ -618,22 +627,23 @@ function HeroCarousel() {
                   transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
                   className={fullBackgroundMobileSlide ? 'relative min-h-[42rem]' : 'relative h-[15.5rem] sm:h-[17.5rem]'}
                 >
-                  <SiteImage
-                    src={activeSlide.image}
-                    alt={activeSlide.title}
-                    fill
-                    priority={prioritizeHeroImage}
-                    sizes="100vw"
-                    quality={72}
-                    className={`object-cover ${activeSlide.mobileImageClassName ?? activeSlide.imageClassName}`}
-                  />
-                  <div
-                    className={`absolute inset-0 ${
-                      fullBackgroundMobileSlide
-                        ? 'bg-[linear-gradient(180deg,rgba(8,19,29,0.18)_0%,rgba(8,19,29,0.34)_30%,rgba(8,19,29,0.8)_100%)]'
-                        : 'bg-[linear-gradient(180deg,rgba(13,22,35,0.28)_0%,rgba(13,22,35,0.08)_100%)]'
-                    }`}
-                  />
+                    <SiteImage
+                      src={activeSlide.image}
+                      alt={activeSlide.title}
+                      fill
+                      priority={prioritizeHeroImage}
+                      sizes="100vw"
+                      quality={activeImageQuality}
+                      className={`object-cover ${activeSlide.mobileImageClassName ?? activeSlide.imageClassName}`}
+                    />
+                    <div
+                      className={`absolute inset-0 ${
+                        fullBackgroundMobileSlide
+                          ? activeSlide.mobileOverlayClassName ??
+                            'bg-[linear-gradient(180deg,rgba(8,19,29,0.18)_0%,rgba(8,19,29,0.34)_30%,rgba(8,19,29,0.8)_100%)]'
+                          : 'bg-[linear-gradient(180deg,rgba(13,22,35,0.28)_0%,rgba(13,22,35,0.08)_100%)]'
+                      }`}
+                    />
                 </motion.div>
 
                 {fullBackgroundMobileSlide ? (
@@ -742,12 +752,13 @@ function HeroCarousel() {
                     fill
                     priority={prioritizeHeroImage}
                     sizes="100vw"
-                    quality={74}
+                    quality={activeImageQuality}
                     className={`object-cover ${activeSlide.imageClassName}`}
                   />
                   <div className={`absolute inset-0 ${
                     fullBackgroundMobileSlide
-                      ? 'bg-[linear-gradient(90deg,rgba(8,19,29,0.72)_0%,rgba(8,19,29,0.48)_34%,rgba(8,19,29,0.18)_68%,rgba(8,19,29,0.1)_100%)]'
+                      ? activeSlide.desktopOverlayClassName ??
+                        'bg-[linear-gradient(90deg,rgba(8,19,29,0.72)_0%,rgba(8,19,29,0.48)_34%,rgba(8,19,29,0.18)_68%,rgba(8,19,29,0.1)_100%)]'
                       : 'bg-[linear-gradient(90deg,rgba(13,22,35,0.68)_0%,rgba(13,22,35,0.45)_34%,rgba(13,22,35,0.12)_72%,rgba(13,22,35,0.08)_100%)]'
                   }`} />
                 </motion.div>
