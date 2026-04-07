@@ -73,7 +73,7 @@ const specialistPoints = [
 
 const trustCards = [
   { title: 'Specialist-Led Dental Care', text: 'Treatments planned and performed with specialist guidance.', img: '/led.webp' },
-  { title: 'Sterilization Excellence', text: 'Strict hygiene protocols to ensure complete patient safety.', img: '/st.webp' },
+  { title: 'Sterilization Excellence', text: 'Strict hygiene protocols to ensure complete patient safety.', img: '/st1.png' },
   { title: 'Digital Diagnostics', text: 'Advanced imaging that supports precise diagnosis.', img: '/dig.webp' },
   { title: 'Patient Consultation', text: 'Treatment is explained clearly so patients feel informed.', img: '/exp.webp' },
   { title: 'Surgical Expertise', text: 'Focused expertise in implantology and oral surgical care.', img: '/st.webp' },
