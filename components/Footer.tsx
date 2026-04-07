@@ -8,6 +8,32 @@ import {
 } from 'lucide-react'
 import SiteImage from '@/components/SiteImage'
 import WhatsAppAppointmentModal from '@/components/WhatsAppAppointmentModal'
+import { TREATMENT_DETAIL_PAGES } from '@/lib/treatmentPages'
+
+const DEFAULT_TREATMENTS_PATH = '/services'
+
+const expertiseLinks = [
+  'Dental Implants',
+  'Braces & Aligners',
+  'Oral Surgeries',
+  'Cosmetic Dentistry',
+  'Doorstep Dentistry',
+].map((label) => {
+  const match = TREATMENT_DETAIL_PAGES.find((item) => item.navLabel === label)
+
+  return {
+    label,
+    href: match ? `/services/${match.slug}` : DEFAULT_TREATMENTS_PATH,
+  }
+})
+
+const navigationLinks = [
+  { name: 'Home', path: '/' },
+  { name: 'About Us', path: '/about' },
+  { name: 'Treatments', path: DEFAULT_TREATMENTS_PATH },
+  { name: 'Gallery', path: '/gallery' },
+  { name: 'Contact', path: '/contact' },
+]
 
 export default function ZenithFooter() {
   const currentYear = new Date().getFullYear();
@@ -108,16 +134,10 @@ export default function ZenithFooter() {
             <div>
               <h4 className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600">Our Expertise</h4>
               <ul className="space-y-4">
-                {[
-                  'Dental Implants', 
-                  'Braces & Aligners', 
-                  'Oral Surgeries', 
-                  'Cosmetic Dentistry', 
-                  'Doorstep Dentistry'
-                ].map((item) => (
-                  <li key={item}>
-                    <Link href="/treatments" className="text-sm font-semibold text-gray-400 hover:text-[#d9c7aa] transition-colors">
-                      {item}
+                {expertiseLinks.map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className="text-sm font-semibold text-gray-400 hover:text-[#d9c7aa] transition-colors">
+                      {item.label}
                     </Link>
                   </li>
                 ))}
@@ -126,13 +146,7 @@ export default function ZenithFooter() {
             <div>
               <h4 className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600">Navigate</h4>
               <ul className="space-y-4">
-                {[
-                  { name: 'Home', path: '/' },
-                  { name: 'About Us', path: '/about' },
-                  { name: 'Treatments', path: '/treatments' },
-                  { name: 'Gallery', path: '/gallery' },
-                  { name: 'Contact', path: '/contact' }
-                ].map((link) => (
+                {navigationLinks.map((link) => (
                   <li key={link.name}>
                     <Link href={link.path} className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">
                       {link.name}
