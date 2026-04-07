@@ -17,7 +17,7 @@ import { queueService } from '@/lib/internal/queueService'
 import { registrationService } from '@/lib/internal/registrationService'
 import type { ClinicPatient, Gender } from '@/types/patient'
 import type { QueueEntry } from '@/types/queue'
-import type { OpRegistrationRecord } from '@/types/registration'
+import type { OpRegistrationRecord, RegistrationOralExaminationEntry } from '@/types/registration'
 import type { ConsultationInput, VisitRecord } from '@/types/visit'
 
 type DoctorView = 'dashboard' | 'queue' | 'patients'
@@ -104,6 +104,17 @@ const emptyRegistration: OpRegistrationRecord = {
   updatedAt: '',
 }
 
+const oralExamFindingOptions = ['Caries', 'Missing', 'Root Stump', 'Impacted', 'Mobility', 'Stains', 'Calculus', 'Fracture']
+
+function formatOralExamToothLabel(tooth: string) {
+  const match = tooth.match(/^(upper|lower)-(\d+)$/)
+  if (!match) return tooth
+
+  const chartNumbers = ['8', '7', '6', '5', '4', '3', '2', '1', '1', '2', '3', '4', '5', '6', '7', '8']
+  const index = Number(match[2]) - 1
+  return chartNumbers[index] ?? tooth
+}
+
 type RegistrationListRow = {
   registration: OpRegistrationRecord
   queueEntry: QueueEntry | null
@@ -120,6 +131,7 @@ export default function DoctorPortal({ initialView = 'dashboard' }: { initialVie
   const [registrations, setRegistrations] = useState<OpRegistrationRecord[]>([])
   const [draftRegistration, setDraftRegistration] = useState<OpRegistrationRecord>(emptyRegistration)
   const [consultation, setConsultation] = useState<ConsultationInput>(emptyConsultation)
+  const [oralExamFinding, setOralExamFinding] = useState(oralExamFindingOptions[0])
   const [activeRegistrationNumber, setActiveRegistrationNumber] = useState('')
   const [feedback, setFeedback] = useState('')
   const [searchText, setSearchText] = useState('')
@@ -262,10 +274,12 @@ export default function DoctorPortal({ initialView = 'dashboard' }: { initialVie
     if (!activeRegistration) {
       setDraftRegistration(emptyRegistration)
       setConsultation(emptyConsultation)
+      setOralExamFinding(oralExamFindingOptions[0])
       return
     }
 
     setDraftRegistration(JSON.parse(JSON.stringify(activeRegistration)) as OpRegistrationRecord)
+    setOralExamFinding(oralExamFindingOptions[0])
 
     const sourceVisit = visits.find((visit) => visit.patientId === activeRegistration.patientId && visit.status === 'Open') ?? null
     setConsultation({
@@ -314,6 +328,26 @@ export default function DoctorPortal({ initialView = 'dashboard' }: { initialVie
         ...current.advisedTreatments,
         [key]: value,
       },
+    }))
+  }
+
+  function toggleOralExamination(tooth: string) {
+    const exists = draftRegistration.oralExamination.some((entry) => entry.tooth === tooth && entry.finding === oralExamFinding)
+
+    setDraftRegistration((current) => ({
+      ...current,
+      oralExamination: exists
+        ? current.oralExamination.filter((entry) => !(entry.tooth === tooth && entry.finding === oralExamFinding))
+        : [...current.oralExamination, { tooth, finding: oralExamFinding }],
+    }))
+  }
+
+  function removeOralExaminationEntry(entryToRemove: RegistrationOralExaminationEntry) {
+    setDraftRegistration((current) => ({
+      ...current,
+      oralExamination: current.oralExamination.filter(
+        (entry) => !(entry.tooth === entryToRemove.tooth && entry.finding === entryToRemove.finding),
+      ),
     }))
   }
 
@@ -530,6 +564,44 @@ export default function DoctorPortal({ initialView = 'dashboard' }: { initialVie
 
                   <DoctorTextarea label="Chief Complaint" value={draftRegistration.chiefComplaint} onChange={(value) => updateDraft('chiefComplaint', value)} rows={3} />
                   <DoctorTextarea label="Dental History" value={draftRegistration.dentalHistory} onChange={(value) => updateDraft('dentalHistory', value)} rows={3} />
+
+                  <div className="rounded-[24px] border border-[#dbe5ef] bg-[#f9fbfe] p-4 sm:p-5">
+                    <div className="text-center text-xl font-extrabold text-[#28408f]">Oral Examination:</div>
+                    <div className="mt-4 grid gap-4 md:grid-cols-[260px_1fr] md:items-start">
+                      <DoctorSelect
+                        label="Select Finding"
+                        value={oralExamFinding}
+                        onChange={(value) => setOralExamFinding(value)}
+                        options={oralExamFindingOptions}
+                      />
+                    </div>
+                    <div className="-mx-1 mt-4 overflow-x-auto px-1">
+                      <div className="min-w-[720px]">
+                        <DoctorDentalChart
+                          selectedFinding={oralExamFinding}
+                          selections={draftRegistration.oralExamination}
+                          onToothToggle={toggleOralExamination}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {draftRegistration.oralExamination.length === 0 ? (
+                        <div className="text-sm text-[#6b7f94]">No oral examination findings selected yet.</div>
+                      ) : (
+                        draftRegistration.oralExamination.map((entry) => (
+                          <button
+                            key={`${entry.tooth}-${entry.finding}`}
+                            type="button"
+                            onClick={() => removeOralExaminationEntry(entry)}
+                            className="rounded-full border border-[#bfd0e3] bg-[#f5f9fd] px-3 py-1 text-sm font-medium text-[#153b68] transition hover:bg-[#edf4fb]"
+                          >
+                            {formatOralExamToothLabel(entry.tooth)} - {entry.finding} x
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
                   <DoctorTextarea label="Diagnosis" value={draftRegistration.diagnosis} onChange={(value) => updateDraft('diagnosis', value)} rows={5} />
                   <DoctorTextarea label="Advised Notes" value={draftRegistration.advisedNotes} onChange={(value) => updateDraft('advisedNotes', value)} rows={3} />
 
@@ -998,6 +1070,66 @@ function DoctorStatusCard({ label, value }: { label: string; value: string }) {
     <div className="rounded-[22px] border border-[#dbe5ef] bg-[#f8fbfe] p-4">
       <div className="mb-3 text-sm font-semibold text-[#4f6277]">{label}</div>
       <StatusBadge label={value} />
+    </div>
+  )
+}
+
+function DoctorDentalChart({
+  selectedFinding,
+  selections,
+  onToothToggle,
+}: {
+  selectedFinding: string
+  selections: RegistrationOralExaminationEntry[]
+  onToothToggle: (tooth: string) => void
+}) {
+  const chartNumbers = ['8', '7', '6', '5', '4', '3', '2', '1', '1', '2', '3', '4', '5', '6', '7', '8']
+  const upperChartCells = chartNumbers.map((label, index) => ({ id: `upper-${index + 1}`, label }))
+  const lowerChartCells = chartNumbers.map((label, index) => ({ id: `lower-${index + 1}`, label }))
+
+  const isSelected = (tooth: string) =>
+    selections.some((entry) => entry.tooth === tooth && entry.finding === selectedFinding)
+
+  const renderToothButton = (cell: { id: string; label: string }) => (
+    <button
+      key={cell.id}
+      type="button"
+      onClick={() => onToothToggle(cell.id)}
+      className={`min-h-[48px] border-r border-[#28408f] text-sm font-bold transition ${
+        isSelected(cell.id)
+          ? 'bg-[#28408f] text-white'
+          : 'bg-white text-[#28408f] hover:bg-[#f3f7fb]'
+      }`}
+      title={`${cell.label} - ${selectedFinding}`}
+    >
+      <div>{cell.label}</div>
+    </button>
+  )
+
+  return (
+    <div className="overflow-hidden rounded-[18px] border-2 border-[#28408f]">
+      <div className="border-b border-[#28408f] px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] text-[#28408f]">
+        Upper
+      </div>
+      <div className="grid border-b border-[#28408f]" style={{ gridTemplateColumns: 'repeat(16, minmax(0, 1fr))' }}>
+        {chartNumbers.map((_, index) => (
+          <div key={`top-empty-${index}`} className="min-h-[34px] border-r border-[#28408f] bg-white last:border-r-0" />
+        ))}
+      </div>
+      <div className="grid border-b border-[#28408f]" style={{ gridTemplateColumns: 'repeat(16, minmax(0, 1fr))' }}>
+        {upperChartCells.map(renderToothButton)}
+      </div>
+      <div className="grid border-b border-[#28408f]" style={{ gridTemplateColumns: 'repeat(16, minmax(0, 1fr))' }}>
+        {lowerChartCells.map(renderToothButton)}
+      </div>
+      <div className="grid" style={{ gridTemplateColumns: 'repeat(16, minmax(0, 1fr))' }}>
+        {chartNumbers.map((_, index) => (
+          <div key={`bottom-empty-${index}`} className="min-h-[34px] border-r border-[#28408f] bg-white last:border-r-0" />
+        ))}
+      </div>
+      <div className="border-t border-[#28408f] px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] text-[#28408f]">
+        Lower
+      </div>
     </div>
   )
 }
